@@ -1,0 +1,138 @@
+﻿@page "/courses"
+    @inject HttpClient Http
+    @inject NavigationManager NavigationManager
+    @inject IJSRuntime JSRuntime // Inject IJSRuntime for JavaScript interop
+    @using System.Text.Json; // Import for JsonSerializer
+
+<h3>Courses</h3>
+
+@if (courses == null)
+{
+    <p>Loading courses...</p>
+}
+else if (courses.Count == 0)
+{
+    <p>No courses available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in courses)
+            {
+                <tr>
+                    <td>@course.Title</td>
+                    <td>@course.Description</td>
+                    <td>@course.Price?.ToString("C") ?? "Free"</td> @* Use null-coalescing and format as currency *@
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => ViewCourseDetails(course.Id))">View Details</button>
+                        @if (course.Price > 0)
+                        {
+                            <button class="btn btn-success" @onclick="@(() => PurchaseCourse(course.Id, course.Price))">Purchase</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Course> courses;
+    private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            courses = await Http.GetFromJsonAsync<List<Course>>("api/Courses");
+            if (courses == null)
+            {
+                courses = new List<Course>();
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error loading courses: {ex.Message}";
+            Console.WriteLine(message);
+            courses = new List<Course>();
+        }
+    }
+
+    private void ViewCourseDetails(int courseId)
+    {
+        NavigationManager.NavigateTo($"/course/{courseId}");
+    }
+
+    private async Task PurchaseCourse(int courseId, decimal? price)
+    {
+        if (price == null || price <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "This course is free and does not require purchase.");
+            return;
+        }
+        // In a real application, you would integrate with a payment gateway.
+        // This is a simplified example.
+        try
+        {
+            // Simulate a payment process (replace with actual payment gateway integration)
+            var paymentSuccessful = await SimulatePayment(price.Value); // Use price.Value
+
+            if (paymentSuccessful)
+            {
+                // 1.  Send purchase information to the server (API endpoint).
+                var purchaseData = new { CourseId = courseId };
+                var response = await Http.PostAsJsonAsync("api/Payments/purchase", purchaseData); // Create a new controller
+                if (response.IsSuccessStatusCode)
+                {
+                    var confirmation = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("alert", $"Purchase successful! Confirmation: {confirmation}");
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("alert", $"Failed to record purchase.  Error: {errorMessage}");
+                }
+
+                // 2.  Navigate the user to a confirmation page or show a message.
+                NavigationManager.NavigateTo($"/purchaseconfirmation/{courseId}"); //create a new page
+
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Payment failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"An error occurred during purchase: {ex.Message}");
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    private async Task<bool> SimulatePayment(decimal amount)
+    {
+        // Simulate a payment process (replace with actual payment gateway integration)
+        await Task.Delay(1000); // Simulate network latency
+
+        // For demonstration, let's say the payment is successful 80% of the time
+        var random = new Random();
+        return random.Next(100) < 80;
+    }
+
+    public class Course
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public decimal? Price { get; set; } // Nullable for free courses
+    }
+    }
