@@ -1,75 +1,53 @@
-﻿@page "/courses"
-    @inject HttpClient Http
-    @inject NavigationManager NavigationManager
-    @inject IJSRuntime JSRuntime //Inject IJSRuntime for JavaScript interop
-    @using System.Text.Json; @* // Import for JsonSerializer *@
+﻿@page "/course/{courseId:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime // Inject IJSRuntime
 
-<h3>Courses</h3>
+<h3>Course Details</h3>
 
-@if (courses == null)
+@if (course == null)
 {
-    <p>Loading courses...</p>
+    <p>Loading course details...</p>
 }
-else if (courses.Count == 0)
+else if (course == null)
 {
-    <p>No courses available.</p>
+    <p>Course not found.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var course in courses)
-            {
-                <tr>
-                    <td>@course.Title</td>
-                    <td>@course.Description</td>
-                    <td>@((course.Price != null) ? course.Price.Value.ToString("C") : "Free")</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="@(() => ViewCourseDetails(course.Id))">View Details</button>
-                        @if (course.Price > 0)
-                        {
-                            <button class="btn btn-success" @onclick="@(() => PurchaseCourse(course.Id, course.Price))">Purchase</button>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h2>@course.Title</h2>
+    <p>@course.Description</p>
+    <p>Price: @((course.Price != null) ? course.Price.Value.ToString("C") : "Free")</p>
+
+    @if (course.Price > 0)
+    {
+        <button class="btn btn-success" @onclick="@(() => PurchaseCourse(course.Id, course.Price))">Purchase</button>
+    }
+    // Display course content (e.g., videos, text, etc.)
+    // You might have a separate component for rendering the content
+    // based on its type (video, text, etc.).
+    // <div>@course.Content</div>
 }
 
 @code {
-    private List<Course> courses;
+    [Parameter]
+    public int courseId { get; set; }
+
+    private Course course;
     private string message;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            courses = await Http.GetFromJsonAsync<List<Course>>("api/Courses");
-            if (courses == null)
-            {
-                courses = new List<Course>();
-            }
+            course = await Http.GetFromJsonAsync<Course>($"api/Courses/{courseId}");
         }
         catch (Exception ex)
         {
-            message = $"Error loading courses: {ex.Message}";
+            message = $"Error loading course details: {ex.Message}";
             Console.WriteLine(message);
-            courses = new List<Course>();
+            course = null;
         }
-    }
-
-    private void ViewCourseDetails(int courseId)
-    {
-        NavigationManager.NavigateTo($"/course/{courseId}");
     }
 
     private async Task PurchaseCourse(int courseId, decimal? price)
@@ -88,7 +66,6 @@ else
 
             if (paymentSuccessful)
             {
-                // 1.  Send purchase information to the server (API endpoint).
                 var purchaseData = new { CourseId = courseId };
                 var response = await Http.PostAsJsonAsync("api/Payments/purchase", purchaseData); // Create a new controller
                 if (response.IsSuccessStatusCode)
@@ -101,10 +78,7 @@ else
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     await JSRuntime.InvokeVoidAsync("alert", $"Failed to record purchase.  Error: {errorMessage}");
                 }
-
-                // 2.  Navigate the user to a confirmation page or show a message.
-                NavigationManager.NavigateTo($"/purchaseconfirmation/{courseId}"); //create a new page
-
+                NavigationManager.NavigateTo($"/purchaseconfirmation/{courseId}");
             }
             else
             {
@@ -135,4 +109,4 @@ else
         public string Description { get; set; }
         public decimal? Price { get; set; } // Nullable for free courses
     }
-    }
+}

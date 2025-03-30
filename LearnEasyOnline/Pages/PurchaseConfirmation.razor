@@ -1,0 +1,57 @@
+﻿@page "/purchaseconfirmation/{courseId:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<h3>Purchase Confirmation</h3>
+
+@if (course == null)
+{
+    <p>Loading confirmation...</p>
+}
+else if (course == null)
+{
+    <p>Confirmation not found.</p>
+}
+else
+{
+    <p>Thank you for your purchase of <strong>@course.Title</strong>!</p>
+    <p>An email confirmation has been sent to your registered email address.</p>
+
+    <button class="btn btn-primary" @onclick="NavigateToCourses">Back to Courses</button>
+}
+
+@code {
+    [Parameter]
+    public int courseId { get; set; }
+
+    private Course course;
+    private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            course = await Http.GetFromJsonAsync<Course>($"api/Courses/{courseId}");
+        }
+        catch (Exception ex)
+        {
+            message = $"Error loading course confirmation: {ex.Message}";
+            Console.WriteLine(message);
+            course = null;
+        }
+    }
+
+    private void NavigateToCourses()
+    {
+        NavigationManager.NavigateTo("/courses");
+    }
+
+    public class Course
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public decimal? Price { get; set; }
+    }
+}

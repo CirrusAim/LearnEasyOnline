@@ -1,0 +1,99 @@
+classDiagram
+
+class IdentityDbContext {
+        <<abstract>>
+    }
+
+  class Student {
+    +string FullName
+    +string? PhoneNumber
+    +int Age
+  }
+  class IdentityUser {
+    +string Email
+    +string UserName
+    // ... other Identity properties
+  }
+  Student --|> IdentityUser : extends
+
+  class Course {
+    +int Id
+    +string Title
+    +string Description
+    +decimal? Price
+    +string? Content
+  }
+
+  class ApplicationDbContext {
+    +DbSet<Student> Students
+    +DbSet<Course> Courses
+    // ... other DbSets
+  }
+IdentityDbContext <|-- ApplicationDbContext : inherits
+    ApplicationDbContext --> Student : manages
+    ApplicationDbContext --> Course : manages
+
+  class RegisterRequest {
+    +string FullName
+    +string Email
+    +string Password
+    +string? PhoneNumber
+    +int Age
+  }
+
+  class LoginRequest {
+    +string Email
+    +string Password
+    +bool RememberMe
+  }
+  
+  class LoginResponse{
+     +string Message
+     +string? Token
+  }
+
+  class AuthController {
+    -_userManager: UserManager<Student>
+    -_signInManager: SignInManager<Student>
+    -_configuration: IConfiguration
+    +IActionResult Register(RegisterRequest model)
+    +IActionResult Login(LoginRequest model)
+    -string GenerateJwtToken(Student user)
+  }
+
+  class CoursesController {
+    -_context: ApplicationDbContext
+    +Task<ActionResult<IEnumerable<Course>>> GetCourses()
+    +Task<ActionResult<Course>> GetCourse(int id)
+    +Task<ActionResult<Course>> CreateCourse(Course course)
+  }
+  
+  class PaymentsController {
+      -_context: ApplicationDbContext
+      //+other fields
+      +IActionResult InitiatePayment(int courseId)
+      +IActionResult HandlePaymentCallback(string transactionId, string status)
+  }
+  
+  
+  
+  AuthController --> Student : uses
+  AuthController --> RegisterRequest : uses
+  AuthController --> LoginRequest : uses
+  AuthController --> LoginResponse : uses
+  
+  
+  AuthController --> Student : uses
+  AuthController --> RegisterRequest : uses
+  AuthController --> LoginRequest : uses
+  AuthController --> LoginResponse : uses
+  
+  CoursesController --> Course : uses
+  CoursesController --> ApplicationDbContext : uses
+  
+  
+  
+  
+  
+
+
