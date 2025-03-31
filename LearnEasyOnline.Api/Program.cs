@@ -20,10 +20,10 @@ namespace LearnEasyOnline.Api
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add Identity
+            // For Identity configurations
             builder.Services.AddIdentity<Student, IdentityRole>(options =>
             {
-                // Password settings (adjust as needed)
+                // Password settings
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
@@ -42,7 +42,7 @@ namespace LearnEasyOnline.Api
                 options.User.RequireUniqueEmail = true;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders(); // Required for password reset, etc.
+                .AddDefaultTokenProviders();
 
             // Add CORS services
             builder.Services.AddCors(options =>
@@ -50,9 +50,9 @@ namespace LearnEasyOnline.Api
                 options.AddPolicy("AllowAll",
                     builder =>
                     {
-                        builder.AllowAnyOrigin();     // Or specify allowed origins
-                        builder.AllowAnyMethod();    // Or specify allowed HTTP methods
-                        builder.AllowAnyHeader();   // Or specify allowed headers
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
                     });
             });
 
@@ -62,14 +62,13 @@ namespace LearnEasyOnline.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 // app.UseSwagger();
                 // app.UseSwaggerUI();
-                app.UseDeveloperExceptionPage(); // Good for development
+                app.UseDeveloperExceptionPage();
             }
             else
             {

@@ -1,0 +1,24 @@
+classDiagram
+
+
+    class Student {
+        string Id
+        string FullName
+        string PhoneNumber
+        int Age
+    }
+    class Courses {
+        int Id
+        string Title
+        string Description
+        decimal Price
+        string Content
+    }
+    class IdentityUser {
+        string Id
+        string Email
+        string UserName
+    }
+    Student --|> IdentityUser : extends
+    Student --|> Courses : "Purchase"
+

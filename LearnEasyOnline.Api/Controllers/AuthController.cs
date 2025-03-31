@@ -148,28 +148,5 @@ namespace LearnEasyOnline.Api.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-        private async Task SeedInitialCourses()
-        {
-            try
-            {
-                // Add some initial courses
-                if (!_context.Courses.Any()) //check if there are any courses already
-                {
-                    _context.Courses.AddRange(
-                        new Course { Title = "Introduction to Blazor", Description = "Learn the basics of Blazor.", Price = 19.99M },
-                        new Course { Title = "ASP.NET Core Web API", Description = "Build RESTful APIs with ASP.NET Core.", Price = 29.99M },
-                        new Course { Title = "Entity Framework Core", Description = "Master data access with EF Core.", Price = 24.99M }
-                    );
-                    await _context.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.Error.WriteLine($"Error in SeedInitialCourses: {ex.Message}");
-                throw; // rethrow the exception so the caller knows.
-            }
-        }
     }
 }

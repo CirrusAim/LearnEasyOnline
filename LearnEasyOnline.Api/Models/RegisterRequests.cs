@@ -18,7 +18,7 @@ namespace LearnEasyOnline.Api.Models
 
         public string? PhoneNumber { get; set; }
 
-        [Range(1, 150)]
+        [Range(1, 100)]
         public int Age { get; set; }
     }
 }

@@ -90,6 +90,8 @@ IdentityDbContext <|-- ApplicationDbContext : inherits
   
   CoursesController --> Course : uses
   CoursesController --> ApplicationDbContext : uses
+  Student --|> Course : purchase
+
   
   
   

@@ -23,10 +23,7 @@ else
     {
         <button class="btn btn-success" @onclick="@(() => PurchaseCourse(course.Id, course.Price))">Purchase</button>
     }
-    // Display course content (e.g., videos, text, etc.)
-    // You might have a separate component for rendering the content
-    // based on its type (video, text, etc.).
-    // <div>@course.Content</div>
+    
 }
 
 @code {
@@ -57,17 +54,17 @@ else
             await JSRuntime.InvokeVoidAsync("alert", "This course is free and does not require purchase.");
             return;
         }
-        // In a real application, you would integrate with a payment gateway.
-        // This is a simplified example.
+
         try
         {
-            // Simulate a payment process (replace with actual payment gateway integration)
-            var paymentSuccessful = await SimulatePayment(price.Value); // Use price.Value
+            // Payment Simulation
+
+            var paymentSuccessful = await SimulatePayment(price.Value);
 
             if (paymentSuccessful)
             {
                 var purchaseData = new { CourseId = courseId };
-                var response = await Http.PostAsJsonAsync("api/Payments/purchase", purchaseData); // Create a new controller
+                var response = await Http.PostAsJsonAsync("api/Payments/purchase", purchaseData); 
                 if (response.IsSuccessStatusCode)
                 {
                     var confirmation = await response.Content.ReadAsStringAsync();
@@ -94,10 +91,10 @@ else
 
     private async Task<bool> SimulatePayment(decimal amount)
     {
-        // Simulate a payment process (replace with actual payment gateway integration)
-        await Task.Delay(1000); // Simulate network latency
+        await Task.Delay(1000); 
 
-        // For demonstration, let's say the payment is successful 80% of the time
+        // Simulating 80% success for payment at all times
+
         var random = new Random();
         return random.Next(100) < 80;
     }
@@ -107,6 +104,6 @@ else
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public decimal? Price { get; set; } // Nullable for free courses
+        public decimal? Price { get; set; } 
     }
 }
