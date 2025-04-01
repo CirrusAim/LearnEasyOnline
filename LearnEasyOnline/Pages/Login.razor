@@ -45,14 +45,16 @@
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                message = result?.Message ?? "Login successful!";
+                message = result?.Message ?? "Login successful!"; // Handle null
                 isSuccess = true;
+                // Store the token securely (e.g., in local storage, with considerations)
                 if (result?.Token != null)
                 {
                     await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", result.Token);
+                    //  await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "authToken", result.Token); //alternative
                 }
 
-                NavigationManager.NavigateTo("/courses"); 
+                NavigationManager.NavigateTo("/courses"); // Redirect to home or another page
             }
             else
             {

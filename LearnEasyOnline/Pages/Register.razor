@@ -54,8 +54,10 @@
             {
                 message = await response.Content.ReadAsStringAsync();
                 isSuccess = true;
-                registrationModel = new RegisterRequest(); 
-                await JSRuntime.InvokeVoidAsync("alert", "Registration successful! Please login."); 
+                registrationModel = new RegisterRequest(); // Clear the form
+                                                           // Optionally, redirect to login page after successful registration
+                                                           // NavigationManager.NavigateTo("/login");
+                await JSRuntime.InvokeVoidAsync("alert", "Registration successful! Please login.");
                 NavigationManager.NavigateTo("/login");
             }
             else
