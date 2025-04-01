@@ -47,7 +47,7 @@ namespace LearnEasyOnline.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -65,11 +65,11 @@ namespace LearnEasyOnline.Api.Controllers
             _context.Courses.Remove(course);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // 204 No Content: Success, nothing to return.
+            return NoContent();
         }
 
         [HttpPost]
-        [Authorize] // Example: Only authenticated users can create courses
+        [Authorize]
         public async Task<ActionResult<Course>> CreateCourse(Course course)
         {
             try
@@ -91,7 +91,7 @@ namespace LearnEasyOnline.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }

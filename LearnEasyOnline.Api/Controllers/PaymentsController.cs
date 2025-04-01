@@ -18,13 +18,13 @@ namespace LearnEasyOnline.Api.Controllers
             try
             {
 
-                // Simulating success for now
+                // Simulating success
                 var confirmationNumber = Guid.NewGuid().ToString();
                 return Ok(confirmationNumber);
             }
             catch (Exception ex)
             {
-                // Log the exception
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }

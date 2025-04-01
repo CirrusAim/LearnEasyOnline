@@ -12,7 +12,6 @@ namespace LearnEasyOnline.Api.Data
         }
 
         public DbSet<Course> Courses { get; set; }
-        // Add other DbSet properties as needed (e.g., for enrollments, payments)
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
