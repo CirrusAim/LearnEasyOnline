@@ -87,7 +87,7 @@ else
 
             if (paymentSuccessful)
             {
-                // 1.  Send purchase information to the server (API endpoint).
+                // Send purchase info to API endpoint
                 var purchaseData = new { CourseId = courseId };
                 var response = await Http.PostAsJsonAsync("api/Payments/purchase", purchaseData); 
                 if (response.IsSuccessStatusCode)
@@ -101,7 +101,7 @@ else
                     await JSRuntime.InvokeVoidAsync("alert", $"Failed to record purchase.  Error: {errorMessage}");
                 }
 
-                // 2.  Navigating the user to a confirmation page or show a message.
+                // Navigating user to a confirmation page
                 NavigationManager.NavigateTo($"/purchaseconfirmation/{courseId}"); 
 
             }
