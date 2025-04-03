@@ -20,38 +20,67 @@ namespace LearnEasyOnline.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
         {
-            try
-            {
-                return await _context.Courses.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var courses = await _context.Courses.ToListAsync();
+            return Ok(courses);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
+            var course = await _context.Courses.FindAsync(id);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(course);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Course>> PostCourse(Course course)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetCourse", new { id = course.Id }, course);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCourse(int id, Course course)
+        {
+            if (id != course.Id)
+            {
+                return BadRequest();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            _context.Entry(course).State = EntityState.Modified;
+
             try
             {
-                var course = await _context.Courses.FindAsync(id);
-
-                if (course == null)
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CourseExists(id))
                 {
                     return NotFound();
                 }
-
-                return course;
+                else
+                {
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
 
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return NoContent();
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
@@ -66,6 +95,11 @@ namespace LearnEasyOnline.Api.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private bool CourseExists(int id)
+        {
+            return _context.Courses.Any(e => e.Id == id);
         }
 
         [HttpPost]

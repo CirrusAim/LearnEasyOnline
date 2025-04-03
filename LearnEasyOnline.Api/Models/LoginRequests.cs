@@ -1,13 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
 namespace LearnEasyOnline.Api.Models
 {
-    public class RegisterRequests
+    public class LoginRequests
     {
-        [Required]
-        public string FullName { get; set; }
-
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -16,9 +12,6 @@ namespace LearnEasyOnline.Api.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        public string? PhoneNumber { get; set; }
-
-        [Range(18, 70)]
-        public int Age { get; set; }
+        public bool RememberMe { get; set; } = false;
     }
 }
